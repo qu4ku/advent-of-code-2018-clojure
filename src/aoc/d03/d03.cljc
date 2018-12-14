@@ -5,13 +5,8 @@
    [aoc.d03.data :refer [input]]
    [clojure.string :as str]))
 
-(def input2
-  "#1 @ 1,3: 4x4
-#2 @ 3,1: 4x4
-#3 @ 5,5: 2x2")
-
 ; First part
-; this solutios is outright terrible, should have used get-in
+; this solution is outright terrible, should have used get-in
 (defn propagate_fabric [size]
   "Create array of 0s: size x size"
   (vec (replicate size (vec (replicate size 0)))))
@@ -41,7 +36,6 @@
           array (assoc array n (increment_elements (nth array n) nums-width))]
       (recur array nums-width (rest nums-height)))))
 
-            
 (defn analyse_fabric [array parsed_data]
   (if (= 0 (count parsed_data))
     array
@@ -51,9 +45,9 @@
           array (increment_array array nums-width nums-height)]
       (recur array (rest parsed_data)))))
 
-
 (def final_fabric (analyse_fabric (propagate_fabric 1000) parsed_data))
 (count (filter #(> % 1) (flatten final_fabric))) ; 110546
+
 
 ; Second part
 (defn overlap? [data final_fabric]
