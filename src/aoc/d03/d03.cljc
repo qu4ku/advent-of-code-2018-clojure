@@ -1,7 +1,5 @@
 ; day03: https://adventofcode.com/2018/day/3
 
-; WIP
-
 (ns aoc.d03.d03
   (:require
    [aoc.d03.data :refer [input]]
@@ -12,19 +10,19 @@
 #2 @ 3,1: 4x4
 #3 @ 5,5: 2x2")
 
-
+; First part
+; this solutios is outright terrible, should have used get-in
 (defn propagate_fabric [size]
-  "Create array: size x size"
+  "Create array of 0s: size x size"
   (vec (replicate size (vec (replicate size 0)))))
-
 
 (defn parse_line [line]
   (-> {}
-      (assoc :num (Integer/parseInt (re-find #"(?<=#)\d" line)))
-      (assoc :left (Integer/parseInt (re-find #"(?<=@ )\d" line)))
-      (assoc :top (Integer/parseInt (re-find #"(?<=,)\d" line)))
-      (assoc :width (Integer/parseInt (re-find #"(?<=: )\d" line)))
-      (assoc :height (Integer/parseInt (re-find #"(?<=x)\d" line)))))
+      (assoc :num (Integer/parseInt (re-find #"(?<=#)\d*" line)))
+      (assoc :left (Integer/parseInt (re-find #"(?<=@ )\d*" line)))
+      (assoc :top (Integer/parseInt (re-find #"(?<=,)\d*" line)))
+      (assoc :width (Integer/parseInt (re-find #"(?<=: )\d*" line)))
+      (assoc :height (Integer/parseInt (re-find #"(?<=x)\d*" line)))))
 
 (def parsed_data (map parse_line (str/split-lines input)))
 
@@ -53,7 +51,17 @@
           array (increment_array array nums-width nums-height)]
       (recur array (rest parsed_data)))))
 
-; (map println (analyse_fabric (propagate_fabric 1000) parsed_data))
+
 (def final_fabric (analyse_fabric (propagate_fabric 1000) parsed_data))
-; (count parsed_data)
-(count (filter #(> % 1) (flatten final_fabric)))
+(count (filter #(> % 1) (flatten final_fabric))) ; 110546
+
+; Second part
+(defn overlap? [data final_fabric]
+  (let [numbers 
+        (for [x (range (:left data) (+ (:left data) (:width data)))
+              y (range (:top data) (+ (:top data) (:height data)))]   
+          (get-in final_fabric [y x]))]
+    (if (= (count numbers) (reduce + numbers))
+      (println (:num data)))))
+
+(map #(overlap? % final_fabric) parsed_data) ; 819
